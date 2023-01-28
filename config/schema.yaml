@@ -1,0 +1,12 @@
+types:
+  Product:
+    properties:
+      name: {nullable: false}
+      description: {nullable: false}
+      image: {range: "Text"}
+
+  Offer:
+    properties:
+      url: {nullable: false}
+      price: {nullable: false, range: "Number"}
+      priceCurrency: {nullable: false}

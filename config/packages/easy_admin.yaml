@@ -1,0 +1,5 @@
+easy_admin:
+  entities:
+    - App\Entity\Product
+    - App\Entity\Offer
+  site_name: 'Best offers for products'

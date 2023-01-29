@@ -15,3 +15,6 @@
 ###< friendsofphp/php-cs-fixer ###
 
 /public/uploads/product-images/*
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

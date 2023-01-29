@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Carbon\Carbon;
@@ -11,6 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
@@ -21,7 +25,9 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @Vich\Uploadable
  */
 #[ORM\Entity]
-#[ApiResource(types: ['https://schema.org/Product'])]
+#[ApiResource(types: ['https://schema.org/Product'], normalizationContext: ['groups' => 'read'], denormalizationContext: ['groups' => 'write'])]
+#[ApiFilter(OrderFilter::class, properties: ['id', 'name'], arguments: ['orderParameterName' => true])]
+#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'price' => 'exact', 'description' => 'partial'])]
 class Product
 {
     #[ORM\Id]
@@ -62,6 +68,7 @@ class Product
     private $imageFile;
 
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: Offer::class)]
+    #[Groups(['read', 'write'])]
     private Collection $offers;
 
     #[ORM\Column(type: 'string')]

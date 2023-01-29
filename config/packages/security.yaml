@@ -10,9 +10,22 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+                pattern: ^/api
+                stateless: true
+                jwt: ~
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
         main:
             lazy: true
             provider: app_user_provider
@@ -21,6 +34,12 @@ security:
                 path: app_logout
                 # where to redirect after logout
                 # target: app_any_route
+            json_login:
+                check_path: /authentication_token
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -32,6 +51,10 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
          - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/register, roles: PUBLIC_ACCESS}
+         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+         - { path: ^/api/products, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY}
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

@@ -7,6 +7,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -32,6 +33,7 @@ class Offer
     #[ApiProperty(types: ['https://schema.org/url'])]
     #[Assert\Url]
     #[Assert\NotNull]
+    #[Groups(['read', 'write'])]
     private string $url;
 
     /**

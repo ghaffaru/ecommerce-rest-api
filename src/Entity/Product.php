@@ -6,13 +6,19 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use Carbon\Carbon;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * Any offered product or service. For example: a pair of shoes; a concert ticket; the rental of a car; a haircut; or an episode of a TV show streamed online.
  *
  * @see https://schema.org/Product
+ * @Vich\Uploadable
  */
 #[ORM\Entity]
 #[ApiResource(types: ['https://schema.org/Product'])]
@@ -52,6 +58,30 @@ class Product
     #[ApiProperty(types: ['https://schema.org/image'])]
     private $image;
 
+    #[Vich\UploadableField(mapping: 'product_images', fileNameProperty: 'image')]
+    private $imageFile;
+
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: Offer::class)]
+    private Collection $offers;
+
+    #[ORM\Column(type: 'string')]
+    private $url;
+
+    public function __construct()
+    {
+        $this->offers = new ArrayCollection();
+    }
+
+    /**
+     * @param mixed $imageFile
+     */
+    public function setImageFile(File $imageFile): void
+    {
+        $this->imageFile = $imageFile;
+
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -85,5 +115,56 @@ class Product
     public function getImage()
     {
         return $this->image;
+    }
+
+    /**
+     * @return Collection<int, Offer>
+     */
+    public function getOffers(): Collection
+    {
+        return $this->offers;
+    }
+
+    public function addOffer(Offer $offer): self
+    {
+        if (!$this->offers->contains($offer)) {
+            $this->offers->add($offer);
+            $offer->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffer(Offer $offer): self
+    {
+        if ($this->offers->removeElement($offer)) {
+            // set the owning side to null (unless already changed)
+            if ($offer->getProduct() === $this) {
+                $offer->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param mixed $url
+     */
+    public function setUrl($url): void
+    {
+        $this->url = $url;
     }
 }
